@@ -2,7 +2,7 @@
 <widget id="com.cincopicos.wphelper" version="0.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>wpHelper</name>
     <description>Enviar WP sin agendar</description>
-    <author email="5picos@gmail.com" href="http://5picos.com.ar/">5Picos</author>
+    <author email="cincopicos.dev@gmail.com" href="http://5picos.com.ar/">5Picos</author>
     <content src="index.html" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
