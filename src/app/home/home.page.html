@@ -13,19 +13,29 @@
 
 <ion-content [fullscreen]="true">
   <ion-item>
-    <ion-label>País</ion-label>
-    <ion-select interface="popover" placeholder="País" value="ar">
-      <ion-select-option value="ar">ARG</ion-select-option>
+    <ion-label>Prefijo de país</ion-label>
+    <ion-select [(ngModel)]="keyPais" interface="popover" placeholder="País">
+      <ion-select-option *ngFor="let p of paises" value="{{p.key}}">{{p.value}}</ion-select-option>
     </ion-select>
-  </ion-item>
+  </ion-item>  
+
   <ion-item>
     <ion-label>Número</ion-label>
     <ion-input type="tel" placeholder="11 556667777" [(ngModel)]="this.numero"></ion-input>
   </ion-item>
-<ion-item>
-  <ion-button slot="end" color="success" (click)="enviar()" expand="block" shape="round">
-    <ion-icon slot="end" name="logo-whatsapp"></ion-icon>
-    Enviar
-  </ion-button>
-</ion-item>
+
+  <ion-item>
+    <ion-button slot="end" color="success" (click)="enviar()" expand="block" shape="round">
+      <ion-icon slot="end" name="logo-whatsapp"></ion-icon>
+      Enviar
+    </ion-button>
+  </ion-item>
+
+  <ion-item>
+    <ion-icon slot="start" name="moon"></ion-icon>
+    <ion-label>
+      Modo oscuro
+    </ion-label>
+    <ion-toggle [(ngModel)]="darkMode" slot="end" (ngModelChange)="change()"></ion-toggle>
+  </ion-item>
 </ion-content>
