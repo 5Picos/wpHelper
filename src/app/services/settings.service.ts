@@ -26,6 +26,7 @@ export class SettingsService {
     this.options.darkMode = this.darkMode;
     this.options.pais = this.pais;
 
+    console.log('GUARDAR:');
     console.log(this.options);
     return this.nativeStorage.setItem(this.key, this.options)
       .catch( (err) => {
@@ -37,6 +38,7 @@ export class SettingsService {
   get() : Promise<any> {
     return this.nativeStorage.getItem(this.key)
       .then( (data) => {
+        console.log('OBTENER');
         console.log(data);
         
         this.darkMode = !!data.darkMode;

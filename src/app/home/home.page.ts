@@ -29,8 +29,8 @@ export class HomePage {
         this.darkMode = this.settings.darkMode;
         this.toggleDarkMode(this.darkMode);
       })
-      .catch( () => {
-        console.log('error al traer los datos');
+      .catch( (err) => {
+        this.settings.setToast("error geting settings" + err);
       });
   }
 
@@ -55,14 +55,17 @@ export class HomePage {
     this.settings.darkMode = this.darkMode;
     this.settings.save()
       .catch( (err) => {
-        console.log('page => ' + err);
+        this.settings.setToast("error saving settings" + err);
       });
   }
 
   async enviar(){
     // Guardo lo seleccionado en el combo pais
     this.settings.pais = this.keyPais;
-    await this.settings.save();
+    await this.settings.save()
+      .catch( (err) => {
+        this.settings.setToast("error saving settings" + err);
+      });
 
     // validaciones globales
     if (this.numero == null) {
