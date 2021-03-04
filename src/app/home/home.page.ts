@@ -32,6 +32,14 @@ export class HomePage {
       .catch( (err) => {
         this.settings.setToast("error geting settings" + err);
       });
+    // this.settings.get_navegador();
+    // let self = this;
+    // setTimeout(function(){
+    //   self.keyPais = self.settings.pais;
+    //   self.darkMode = self.settings.darkMode;
+    //   self.toggleDarkMode(self.darkMode);
+    //   console.log(self.settings);
+    // }, 500);
   }
 
   ionViewDidEnter(){
@@ -46,26 +54,35 @@ export class HomePage {
 
   async toggleDarkMode(estado){
     document.body.classList.toggle('dark', estado);
-    this.settings.darkMode = estado;
-    await this.settings.save();
-  }
+    this.darkMode = estado;
 
-  change() {
-    document.body.classList.toggle('dark', this.darkMode);
-    this.settings.darkMode = this.darkMode;
+    this.actualizarDatosSettings();
     this.settings.save()
       .catch( (err) => {
         this.settings.setToast("error saving settings" + err);
       });
+    // this.settings.save_navegador();
+  }
+
+  change() {
+    document.body.classList.toggle('dark', this.darkMode);
+
+    this.actualizarDatosSettings();
+    this.settings.save()
+      .catch( (err) => {
+        this.settings.setToast("error saving settings" + err);
+      });
+    // this.settings.save_navegador();
   }
 
   async enviar(){
     // Guardo lo seleccionado en el combo pais
-    this.settings.pais = this.keyPais;
-    await this.settings.save()
+    this.actualizarDatosSettings();
+    this.settings.save()
       .catch( (err) => {
         this.settings.setToast("error saving settings" + err);
-      });
+    });
+    // this.settings.save_navegador();
 
     // validaciones globales
     if (this.numero == null) {
@@ -122,5 +139,10 @@ export class HomePage {
 
   exit() {
     navigator['app'].exitApp();
+  }
+
+  private actualizarDatosSettings(){
+    this.settings.darkMode = this.darkMode;
+    this.settings.pais = this.keyPais;
   }
 }

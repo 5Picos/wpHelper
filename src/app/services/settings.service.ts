@@ -1,6 +1,10 @@
 import { Injectable, Type } from '@angular/core';
 import { ToastController } from '@ionic/angular';
-import { NativeStorage } from '@ionic-native/native-storage/ngx';
+
+// No esta funcionando
+// import { NativeStorage } from '@ionic-native/native-storage/ngx';
+
+import { Storage } from '@ionic/storage';
 
 export interface Pais {
   key: string;
@@ -19,30 +23,71 @@ export class SettingsService {
 
   constructor(
     private toastController: ToastController,
-    private nativeStorage: NativeStorage,
+    // private nativeStorage: NativeStorage,
+    private storage: Storage,
   ) { }
+
+  // Native Storage
+  // save() : Promise<any> {
+  //   this.options.darkMode = this.darkMode;
+  //   this.options.pais = this.pais;
+
+  //   console.log('GUARDAR:');
+  //   console.log(this.options);
+  //   return this.nativeStorage.setItem(this.key, this.options)
+  //     .catch( (err) => {
+  //       console.log('ERR =>');
+  //       console.log(err);
+  //     })
+  // }
 
   save() : Promise<any> {
     this.options.darkMode = this.darkMode;
     this.options.pais = this.pais;
 
     console.log('GUARDAR:');
+    console.log('options');
     console.log(this.options);
-    return this.nativeStorage.setItem(this.key, this.options)
+
+    let joptions = JSON.stringify(this.options);
+    console.log('stringify');
+    console.log(joptions);
+
+    return this.storage.set(this.key, joptions)
       .catch( (err) => {
         console.log('ERR =>');
         console.log(err);
       })
   }
 
+  // Native Storage
+  // get() : Promise<any> {
+  //   return this.nativeStorage.getItem(this.key)
+  //     .then( (data) => {
+  //       console.log('OBTENER');
+  //       console.log(data);
+        
+  //       this.darkMode = !!data.darkMode;
+  //       this.pais = data.pais;
+  //     })
+  //     .catch( (err) => {
+  //       console.log('get ERR =>');
+  //       console.log(err);
+  //     })
+  // }
+
   get() : Promise<any> {
-    return this.nativeStorage.getItem(this.key)
+    return this.storage.get(this.key)
       .then( (data) => {
         console.log('OBTENER');
         console.log(data);
-        
-        this.darkMode = !!data.darkMode;
-        this.pais = data.pais;
+
+        if (data != null) {
+          this.options = JSON.parse(data);
+        }
+
+        this.darkMode = !!this.options.darkMode;
+        this.pais = this.options.pais;
       })
       .catch( (err) => {
         console.log('get ERR =>');
