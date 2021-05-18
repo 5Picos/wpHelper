@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ToastController, Platform } from '@ionic/angular';
+import { TranslateService } from '@ngx-translate/core';
 import { Pais, SettingsService } from '../services/settings.service';
 
 @Component({
@@ -9,19 +10,31 @@ import { Pais, SettingsService } from '../services/settings.service';
 })
 export class HomePage {
   public numero: number = undefined;
+
   public paises: Array<Pais>;
   public keyPais: string;
+  public pais:string; // para el placeholder
+
+  public idiomas: Array<string>=[];
+  public keyIdioma: string;
+
   public darkMode: boolean;
   private subscription: any;
+
 
   constructor(
     private toastController: ToastController, 
     private platform: Platform, 
     private settings: SettingsService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {
     this.paises = this.settings.paisList;
+    this.idiomas = this.translate.getLangs();
+    console.log(this.idiomas);
+    
+    this.keyIdioma = this.translate.getBrowserLang();
 
     this.settings.get()
       .then( () => {
@@ -62,6 +75,10 @@ export class HomePage {
         this.settings.setToast("error saving settings" + err);
       });
     // this.settings.save_navegador();
+  }
+
+  cambiar_idioma(idioma: string) {
+    this.translate.use(idioma);
   }
 
   change() {

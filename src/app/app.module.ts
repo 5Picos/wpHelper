@@ -13,8 +13,13 @@ import { AppRoutingModule } from './app-routing.module';
 // No estaria funcionando
 // import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { IonicStorageModule } from '@ionic/storage';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-
+export function translateLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http, './assets/idiomas/', '.json');
+}
 
 @NgModule({
   declarations: [AppComponent ],
@@ -23,10 +28,18 @@ import { IonicStorageModule } from '@ionic/storage';
     BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
+    HttpClientModule,
     IonicStorageModule.forRoot({
       name: 'db_wpHelper',
       driverOrder: ['indexeddb', 'sqlite', 'websql']
-    })
+    }),
+    TranslateModule.forRoot({
+      loader: {
+        provide: TranslateLoader,
+        useFactory: translateLoaderFactory,
+        deps: [HttpClient]
+      }
+    }),
   ],
   providers: [
     StatusBar,
