@@ -13,43 +13,42 @@
 
 <ion-content class="ion-padding">
   <ion-item>
-    <ion-label>{{ 'PREFIJO' | translate }}</ion-label>
-    <ion-select [(ngModel)]="keyPais" interface="popover" placeholder={{pais}}>
-      <ion-select-option *ngFor="let p of paises" value="{{p.key}}">{{p.value}}</ion-select-option>
-    </ion-select>
-  </ion-item>  
-
-  <ion-item>
-    <ion-label>{{ 'NUMERO' | translate }}</ion-label>
-    <ion-input type="tel" placeholder="11 556667777" [(ngModel)]="this.numero"></ion-input>
+    <ion-label>{{ 'PREFIX' | translate }}</ion-label>
+    <ionic-selectable
+      [(ngModel)]="country"
+      [items]="countries"
+      itemValueField="prefix"
+      itemTextField="displayName"
+      [canSearch]="true"
+      closeButtonText="{{ 'CLOSE' | translate }}"
+      closeButtonSlot="end"
+      (onChange)="countryChange($event)">
+    </ionic-selectable>
   </ion-item>
 
-  <ion-button mode=ios (click)="enviar()" color=success expand="block" fill="outline">
+  <ion-item>
+    <ion-label>{{ 'NUMBER' | translate }}</ion-label>
+    <ion-input type="tel" placeholder="11 556667777" [(ngModel)]="inputNumber" clearInput class="ion-text-right"></ion-input>
+  </ion-item>
+
+  <ion-button mode=ios (click)="send()" color=success expand="block" fill="outline">
     <div>
       <ion-icon name=logo-whatsapp></ion-icon>
       <br>
-      {{ 'ENVIAR' | translate }}
+      {{ 'SEND' | translate }}
     </div>
   </ion-button>
 
   <ion-item>
-    <ion-label>{{ 'CONFIG' | translate }}</ion-label>
+    <ion-label>{{ 'SETTINGS' | translate }}</ion-label>
   </ion-item>
 
   <ion-item>
     <ion-icon slot="start" name="moon"></ion-icon>
     <ion-label>
-      {{ 'MODO_OSCURO' | translate }}
+      {{ 'DARK_MODE' | translate }}
     </ion-label>
-    <ion-toggle [(ngModel)]="darkMode" slot="end" (ngModelChange)="change()"></ion-toggle>
+    <ion-toggle [(ngModel)]="darkMode" slot="end" (ngModelChange)="changeMode()"></ion-toggle>
   </ion-item>
-
-  <!-- <ion-item>
-    <ion-icon slot="start" name="language-outline"></ion-icon>
-    <ion-label>{{ 'IDIOMA' | translate }}</ion-label>
-    <ion-select #idiomaSeleccionado [(ngModel)]="keyIdioma" interface="popover" (change)=cambiar_idioma(idiomaSeleccionado.value)>
-      <ion-select-option *ngFor="let i of idiomas" value={{i}}>{{i}}</ion-select-option>
-    </ion-select>
-  </ion-item> -->
 
 </ion-content>

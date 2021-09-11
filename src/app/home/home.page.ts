@@ -1,7 +1,13 @@
 import { Component } from '@angular/core';
-import { ToastController, Platform } from '@ionic/angular';
+import { Platform } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
-import { Pais, SettingsService } from '../services/settings.service';
+import { SettingsService } from '../services/settings.service';
+
+import { IonicSelectableComponent } from 'ionic-selectable';
+import { CountryService } from '../services/country.service';
+import { Country } from '../models/country';
+import { ValidateService } from '../services/validate.service';
+import { Validations } from '../models/validations';
 
 @Component({
   selector: 'app-home',
@@ -9,50 +15,43 @@ import { Pais, SettingsService } from '../services/settings.service';
   styleUrls: ['home.page.scss'],
 })
 export class HomePage {
-  public numero: number = undefined;
+  inputNumber: string = "";
 
-  public paises: Array<Pais>;
-  public keyPais: string;
-  public pais:string; // para el placeholder
-
-  public idiomas: Array<string>=[];
-  public keyIdioma: string;
-
-  public darkMode: boolean;
-  private subscription: any;
-
+  countries: Country[] = [];
+  country: Country;
+  
+  darkMode: boolean;
+  subscription: any;
 
   constructor(
-    private toastController: ToastController, 
     private platform: Platform, 
     private settings: SettingsService,
     private translate: TranslateService,
-  ) {}
+    private countryService: CountryService,
+    private validateService: ValidateService,
+  ) { }
 
   ngOnInit() {
-    this.paises = this.settings.paisList;
-    this.idiomas = this.translate.getLangs();
-    console.log(this.idiomas);
-    
-    this.keyIdioma = this.translate.getBrowserLang();
+    this.countries = this.countryService.getCountries();
+    this.country = this.countries[0];
 
     this.settings.get()
       .then( () => {
-        this.keyPais = this.settings.pais;
         this.darkMode = this.settings.darkMode;
+        this.country = this.countries.find( (x) => x.prefix == this.settings.prefix)
+
         this.toggleDarkMode(this.darkMode);
       })
       .catch( (err) => {
-        this.settings.setToast("error geting settings" + err);
+        this.settings.setToast("error geting settings - " + err);
       });
-    // this.settings.get_navegador();
-    // let self = this;
-    // setTimeout(function(){
-    //   self.keyPais = self.settings.pais;
-    //   self.darkMode = self.settings.darkMode;
-    //   self.toggleDarkMode(self.darkMode);
-    //   console.log(self.settings);
-    // }, 500);
+  }
+
+  countryChange(event: {
+    component: IonicSelectableComponent,
+    value: any
+  }) {
+    this.country = event.value;
   }
 
   ionViewDidEnter(){
@@ -72,86 +71,71 @@ export class HomePage {
     this.actualizarDatosSettings();
     this.settings.save()
       .catch( (err) => {
-        this.settings.setToast("error saving settings" + err);
+        this.settings.setToast(this.translate.instant("ERR_SAVING") + err);
       });
-    // this.settings.save_navegador();
   }
 
-  cambiar_idioma(idioma: string) {
-    this.translate.use(idioma);
-  }
-
-  change() {
+  changeMode() {
     document.body.classList.toggle('dark', this.darkMode);
 
     this.actualizarDatosSettings();
     this.settings.save()
       .catch( (err) => {
-        this.settings.setToast("error saving settings" + err);
+        this.settings.setToast(this.translate.instant("ERR_SAVING") + err);
       });
-    // this.settings.save_navegador();
   }
 
-  async enviar(){
+  async send() {
+    var esArgentina: boolean = this.country.prefix == "54";
+
     // Guardo lo seleccionado en el combo pais
     this.actualizarDatosSettings();
     this.settings.save()
       .catch( (err) => {
-        this.settings.setToast("error saving settings" + err);
+        console.log(err);
+        // TODO this.settings.setToast(this.translate.instant("ERR_SAVING") + err);
     });
-    // this.settings.save_navegador();
+
+    // normalizo el input (sacar espacios, guiones)
+    let cellNumber = this.inputNumber.toString().replace(/ /g, "");
+    cellNumber = cellNumber.replace(/-/g, "");
 
     // validaciones globales
-    if (this.numero == null) {
-      this.settings.setToast("Ingrese un valor")
-      return 0;
+    var errors: Validations = this.validateService.validate(cellNumber)
+    if (errors.hasErrors) {
+      this.settings.setToast(errors.lastMessage)
+      return;
     }
 
-    if (isNaN(this.numero)) {
-      this.settings.setToast("Ingrese un número")
-      return 0;
+    // validaciones solo para argentina
+    if (esArgentina) {
+      errors = this.validateService.ArgValidate(cellNumber);
+      if (errors.hasErrors) {
+        this.settings.setToast(errors.lastMessage)
+        return;
+      }
     }
 
-    let n = this.numero.toString().replace(/ /g, "")
-
-    // validaciones solo para argentina, el resto ni idea
-    if (this.keyPais == "54") {
-
-      // 3516858492 => length = 10
-      if (n.length == 10 && n[0] == "9") {
-        // Ingreso un numero con el 9 pero no es valido porque tiene lng = 10 en vez de 11
-        this.settings.setToast("Número incorrecto: falta un número \nAl seleccionar el pais no requiere el 9");
-        return 0;
+    var selectedPrefix = this.getPrefix();
+    if (selectedPrefix && !cellNumber.startsWith(selectedPrefix)) {
+      // completar con el prefijo
+      if (esArgentina) {
+        if (cellNumber.length == 11) {
+          cellNumber = "54" + cellNumber;
+        } else {
+          cellNumber = "549" + cellNumber;         
+        }
       }
-  
-      if (n.length == 11 && n[0] != "9") {
-        // Ingreso un numero sin el 9 pero no es valido porque tiene lng = 11 en vez de 10
-        this.settings.setToast("Número incorrecto: sobra un número \nAl seleccionar el pais no requiere el 9");
-        return 0;
+      else {
+        cellNumber = this.getPrefix() + cellNumber;
       }
-  
-      if (n.length < 10 || n.length > 11) {
-        // Ingreso un numero que no es un telefono
-        this.settings.setToast("Número incorrecto: no es un teléfono")
-        return 0;
-      }
-
-      // Validaciones OK
-      if (n.length == 11) {
-        n = "54" + n;
-      } else {
-        n = "549" + n; 
-      }
-    } else {
-      n = this.getCodigoPais() + n;
     }
-
-    window.open("https://api.whatsapp.com/send?phone=" + n);
+    window.open("https://api.whatsapp.com/send?phone=" + cellNumber);
   }
 
-  private getCodigoPais(): string {
-    if (this.keyPais == "0") return "";
-    return this.keyPais;
+  private getPrefix(): string {
+    if (this.country.prefix == "0") return "";
+    return this.country.prefix;
   }
 
   exit() {
@@ -160,6 +144,6 @@ export class HomePage {
 
   private actualizarDatosSettings(){
     this.settings.darkMode = this.darkMode;
-    this.settings.pais = this.keyPais;
+    this.settings.prefix = this.country.prefix;
   }
 }

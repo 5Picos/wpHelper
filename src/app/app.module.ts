@@ -9,13 +9,12 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
-
-// No estaria funcionando
-// import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { IonicStorageModule } from '@ionic/storage';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+
+import { IonicSelectableModule } from 'ionic-selectable';
 
 export function translateLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/idiomas/', '.json');
@@ -40,6 +39,7 @@ export function translateLoaderFactory(http: HttpClient) {
         deps: [HttpClient]
       }
     }),
+    IonicSelectableModule,
   ],
   providers: [
     StatusBar,
