@@ -23,7 +23,7 @@ export class AppComponent {
   inicializar_traductor() {
     console.log('getBrowserLang: ' + this.translate.getBrowserLang());
     this.translate.setDefaultLang('en');
-    this.translate.use(this.translate.getBrowserLang());
+    // this.translate.use(this.translate.getBrowserLang());
     this.translate.addLangs(['es', 'en']);
   }
 
